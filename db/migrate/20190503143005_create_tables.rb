@@ -1,9 +1,11 @@
 class CreateTables < ActiveRecord::Migration[5.2]
   def change
     create_table :movies do |t|
+      t.integer :tmdb_id
       t.string :title
       t.string :series
       t.string :genre
+      t.text :description
       t.datetime :release_date
     end
 
