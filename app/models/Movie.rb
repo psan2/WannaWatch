@@ -1,5 +1,5 @@
 class Movie < ActiveRecord::Base
-    has_many :wannawatch 
+    has_many :wannawatches
 
     def upcoming_movies #returns an array of all upcoming movies 
     end 
