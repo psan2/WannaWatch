@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-    has_many :wannawatch
+    has_many :wannawatches
 
     # def log_in
     # end 

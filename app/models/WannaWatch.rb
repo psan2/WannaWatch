@@ -1,5 +1,6 @@
 class Wannawatch < ActiveRecord::Base
-    belongs_to :users, :movies
+    belongs_to :user
+    belongs_to :movie
 
 end
     
