@@ -62,3 +62,7 @@ def update_upcoming_movies(arr_movies)
         .find_or_create_by(tmdb_id:movie_params["id"])
     end
 end
+
+def master_update
+    update_upcoming_movies(fetch_all_pages)
+end
