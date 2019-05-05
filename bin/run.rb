@@ -1,3 +1,7 @@
 require_relative('../config/environment.rb')
 
-update_upcoming_movies(fetch_all_pages)
+binding.pry
+
+def update
+    update_upcoming_movies(fetch_all_pages)
+end
