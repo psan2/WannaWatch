@@ -64,5 +64,6 @@ def update_upcoming_movies(arr_movies)
 end
 
 def master_update
-    update_upcoming_movies(fetch_all_pages)
+    # update_upcoming_movies(fetch_all_pages)
+    
 end
