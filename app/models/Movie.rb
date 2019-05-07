@@ -9,8 +9,8 @@ class Movie < ActiveRecord::Base
         return all.map { |movie| movie.title }.sort
     end
 
-    def self.term_in_column(term, selection)
-        return Movie.where("#{term} LIKE ?", "#{selection}")
+    def self.column_contains(column, search_term)
+        return Movie.where("#{column} LIKE ?", "%#{search_term}%")
     end
 
     def upcoming_movies #returns an array of all upcoming movies 

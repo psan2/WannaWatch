@@ -69,3 +69,26 @@ def fetch_all
         year += 1
     end
 end
+
+def update_series(tmdb_id)
+    url = URI("https://api.themoviedb.org/3/movie/#{tmdb_id}?language=en-US&api_key=be6bc01e83db5bd420caf0e567ab2965")
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    request = Net::HTTP::Get.new(url)
+    request.body = "{}"
+
+    results_hash = JSON.parse(http.request(request).read_body)
+
+    Movie.find_by(tmdb_id: tmdb_id).update(imdb_id: results_hash["imdb_id"])
+
+    if results_hash["belongs_to_collection"] != nil
+        Movie.find_by(tmdb_id: tmdb_id).update(series: results_hash["belongs_to_collection"]["name"])
+    end
+    sleep(0.25)
+end
+
+def update_all_series
+    Movie.all.each { |movie| update_series(movie.tmdb_id) }
+end
