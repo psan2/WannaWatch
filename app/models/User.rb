@@ -26,11 +26,11 @@ class User < ActiveRecord::Base
         return encrypted_pw
     end
 
-    # def add_a_watch 
-    # end 
+    def add_a_watch 
+    end 
 
-    # def return_watch_list 
-    # end 
+    def return_watch_list 
+    end 
 
 end
     

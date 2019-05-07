@@ -90,14 +90,78 @@ end
 
 def login
 
-username = $prompt.ask("Please enter your username.")
-if User.find_by(name: username)
-    puts "Welcome back, #{username}!"
-    User.find_by(name: username).authenticate
+    username = $prompt.ask("Please enter your username.")
+    if User.find_by(name: username)
+        puts "Welcome back, #{username}!"
+        User.find_by(name: username).authenticate
 
-else
-    puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.) Would you like to try again?"
+    else
+        puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.) Would you like to try again?"
+    end
+
+
 end
 
 
-end
+
+
+def main_menu(current_user)
+    mainmenu = TTY::Prompt.new 
+
+    selection = mainmenu.select("", per_page: 10) do |option|
+        option.choice 'What do you WannaWatch?'
+        option.choice 'View my list'
+
+    end
+
+    case selection 
+
+    when 'What do you WannaWatch?'
+        WannaWatch_list
+        
+    when 'View my list'
+        
+    end 
+end 
+
+
+def WannaWatch_list
+    list = TTY::Prompt.new 
+
+    selection = list.select("", per_page: 10) do |option|
+        option.choice 'View by series'
+        option.choice 'View by genre'
+        option.choice 'View all upcoming movies'
+        option.choice 'View by popularity'
+
+    end
+
+    case selection 
+
+    when 'View by series' 
+        puts 'nothing'
+        #use the relevant API to select the movies by series
+        #refer back to a method that does this
+    
+    when 'View by genre'
+        puts 'nothing'
+        #use the relevant API to select the movies by genre 
+        #refer back to a method that does this
+
+    when 'View all upcoming movies' 
+        puts 'nothing' 
+        #use the relevant API to return all the upcoming movies 
+        #refer back to a method that does this
+     
+    when 'View by popularity'
+        puts 'nothing'
+        #use the relevant API to select the movies by popularity 
+        #refer back to a method that does this
+    
+    end 
+end 
+    
+
+
+
+
