@@ -12,6 +12,10 @@ def break_
 end 
 
 def welcome
+<<<<<<< HEAD
+    puts "Welcome to WannaWatch!"
+    # glasses_animation
+=======
     
     glasses_animation
 
@@ -25,6 +29,7 @@ def welcome
     break_ 
 
     
+>>>>>>> master
 end
 
 def greeting 
@@ -33,19 +38,19 @@ def greeting
 end 
 
 def start_menu
-    selection = $prompt.select("", per_page: 10) do |option|
-        option.choice 'Create a new user'
-        option.choice 'Log in with an existing user'
-        option.choice 'Quit'
+    selection = $prompt.select("", per_page: 10) do |a|
+        a.choice 'New user'
+        a.choice 'Log in'
+        a.choice 'Quit'
     end
 
     case selection
 
-    when 'Create a new user'
+    when 'New user'
         new_user
         start_menu
 
-    when 'Log in with an existing user'
+    when 'Log in'
         puts "Welcome back!"
         login
 
@@ -63,6 +68,7 @@ end
 
 def new_user
     puts "We're glad you're here!"
+    sleep($naptime)
 
     username = new_username
     password = new_password
@@ -78,6 +84,7 @@ def new_username
         username = $prompt.ask("Please enter a username.")
         username_exists = User.where(name: username).length > 0
         if username_exists == true
+            sleep($naptime)
             puts "Unfortunately for Forrest Gump, this seat's taken. And so is that username."
         end
     end
@@ -104,7 +111,7 @@ def new_password
             puts "Obi-Wan says, 'These aren't the passwords you're looking for.' Unfortunately, your passwords didn't match. Let's try again."
         else
             puts "Nice one! Accelerating to 88 miles per hour..."
-            sleep 2
+            sleep($naptime)
         end
     end
 
@@ -119,8 +126,19 @@ def login
         User.find_by(name: username).authenticate
 
     else
-        puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.) Would you like to try again?"
+        puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.)"
+        selection = $prompt.select("Try again?") do |a|
+            a.choice 'Try again'
+            a.choice 'Click your heels three times (to go back to the menu)'
+        end
+
+        case selection
+
+        when 'Try again'
+            login
+
+        when 'Click your heels three times (to go back to the menu)'
+            start_menu
+        end
     end
-
-
 end

@@ -7,7 +7,8 @@ class User < ActiveRecord::Base
         pw = $prompt.mask("Please enter your password.")
         if self.password_check(pw) == true
             puts "There's no place like home. Welcome back!"
-            main_menu(self)
+            $current_user = self
+            main_menu
         else
             try_again = TTY::Prompt.new
             selection = try_again.select("Sorry, that doesn't look quite right. Try again?", per_page: 10) do |option|
