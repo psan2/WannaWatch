@@ -2,21 +2,24 @@ def main_menu(current_user)
     selection = $prompt.select("", per_page: 10) do |option|
         option.choice 'What do you WannaWatch?'
         option.choice 'View my list'
+        option.choice 'Logout'
 
     end
 
     case selection 
 
     when 'What do you WannaWatch?'
-        wannawatch_list
+        find_movies
         
     when 'View my list'
+        view_my_list
+
         
     end 
 end 
 
 
-def wannawatch_list
+def find_movies
     selection = $prompt.select("", per_page: 10) do |option|
         option.choice 'View by series'
         option.choice 'View by genre'
