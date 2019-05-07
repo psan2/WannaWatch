@@ -51,4 +51,8 @@ end
 def view_by_genre
     genres = Movie.genres
     selection = $prompt.select("What genre would you like to see movies from?", genres, filter: true)
+
+    movies = Movie.term_in_column("genre", selection).titles
+    selection = $prompt.select("Pick a movie to see more information", movies, filter: true)
+
 end
