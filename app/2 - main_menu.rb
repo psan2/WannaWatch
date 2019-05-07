@@ -14,7 +14,7 @@ def main_menu
         view_my_list
 
     when 'Logout'
-        puts "Hasta la vista, baby."
+        puts "👓 Hasta la vista, baby 👓"
         $current_user = nil
         start_menu
 
@@ -35,9 +35,7 @@ def find_movies
     case selection 
 
     when 'View by series' 
-        puts 'nothing'
-        #use the relevant API to select the movies by series
-        #refer back to a method that does this
+        view_by_series
     
     when 'View by genre'
         view_by_genre
@@ -55,29 +53,34 @@ def find_movies
     end 
 end 
 
+def view_by_series
+    series = Movie.series
+    selection = $prompt.select("What series would you like to see movies from?", series, filter: true)
+    movies = Movie.column_contains("series", selection).titles
+    browse_movies(movies)
+end
+
 def view_by_genre
     genres = Movie.genres
-    selection = $prompt.select("What genre would you like to see movies from?", genres, filter:true)
-
+    selection = $prompt.select("What genre would you like to see movies from?", genres, filter: true)
     movies = Movie.column_contains("genre", selection).titles
     browse_movies(movies)
 end
 
 def browse_movies(movies)
-    selection = $prompt.select("Pick a movie to see what it's about:", movies, filter:true)
+    selection = $prompt.select("Pick a movie to see what it's about:", movies, filter: true)
     target_movie = Movie.find_by(title:selection)
     description_view(target_movie)
     add_wannawatch(target_movie)
 end
 
 def description_view(movie)
-    
+    small_break
     puts movie.title
-    puts <<-border
-    ===========================
-
     border
     puts movie.description
+    small_break
+
     if wannawatch?
         add_wannawatch(movie)
     else
@@ -101,5 +104,6 @@ def wannawatch?
 end
 
 def add_wannawatch(movie)
-    Wannawatch.find_or_create_by_movie_id_and_user_id(movie.id, $current_user.id)
+    Wannawatch.find_or_create_by(movie_id: movie.id, user_id:$current_user.id)
+    main_menu
 end

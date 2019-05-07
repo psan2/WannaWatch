@@ -12,24 +12,17 @@ def break_
 end 
 
 def welcome
-<<<<<<< HEAD
-    puts "Welcome to WannaWatch!"
-    # glasses_animation
-=======
     
     glasses_animation
 
-    break_
-    break_
-    break_ 
+    small_break
+    small_break
 
     greeting
 
-    break_
-    break_ 
-
+    small_break
+    small_break
     
->>>>>>> master
 end
 
 def greeting 
@@ -43,6 +36,7 @@ def start_menu
         a.choice 'Log in'
         a.choice 'Quit'
     end
+    small_break
 
     case selection
 
