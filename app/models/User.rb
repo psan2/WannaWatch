@@ -1,3 +1,5 @@
+require 'digest'
+
 class User < ActiveRecord::Base
     has_many :wannawatches
 
@@ -16,7 +18,12 @@ class User < ActiveRecord::Base
     end
 
     def password_check(pw)
-        pw == self.password ? true : false
+        User.hash_password(pw) == self.password ? true : false
+    end
+
+    def self.hash_password(pw)
+        encrypted_pw = Digest::SHA1.hexdigest(pw)
+        return encrypted_pw
     end
 
     # def add_a_watch 

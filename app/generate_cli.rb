@@ -30,7 +30,7 @@ def start_menu
 
     when 'Quit'
         quit
-        
+
     end
 end
 
@@ -85,7 +85,7 @@ def new_password
         end
     end
 
-    return password1
+    return User.hash_password(password1)
 end
 
 def login
@@ -95,7 +95,7 @@ if User.find_by(name: username)
     puts "Welcome back, #{username}!"
     User.find_by(name: username).authenticate
 
-else current_user == nil
+else
     puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.) Would you like to try again?"
 end
 
