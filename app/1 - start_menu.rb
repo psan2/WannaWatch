@@ -9,6 +9,7 @@ end
 
 def welcome
     puts "Welcome to WannaWatch!"
+    glasses_animation
 end
 
 def start_menu
