@@ -7,10 +7,30 @@ def startup
     start_menu
 end
 
+def break_
+    puts ""
+end 
+
 def welcome
-    puts "Welcome to WannaWatch!"
+    
     glasses_animation
+
+    break_
+    break_
+    break_ 
+
+    greeting
+
+    break_
+    break_ 
+
+    
 end
+
+def greeting 
+    hello_user = Artii::Base.new :font => 'slant'
+    puts hello_user.asciify('Welcome to WannaWatch!')
+end 
 
 def start_menu
     selection = $prompt.select("", per_page: 10) do |option|
@@ -38,6 +58,8 @@ end
 def quit
     puts "Thanks for watching!"
 end
+
+
 
 def new_user
     puts "We're glad you're here!"
