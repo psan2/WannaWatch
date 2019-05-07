@@ -7,6 +7,7 @@ end
 
 def welcome
     puts "Welcome to WannaWatch!"
+    3D_glasses_animation
 end
 
 def start_menu
@@ -120,6 +121,7 @@ def main_menu(current_user)
         WannaWatch_list
         
     when 'View my list'
+
         
     end 
 end 
@@ -160,6 +162,21 @@ def WannaWatch_list
     
     end 
 end 
+
+
+
+def user_list 
+
+    list = TTY::Prompt.new 
+
+    selection = list.select("", per_page: 10) do |option|
+        option.choice ''
+        option.choice 'View by genre'
+        option.choice 'View all upcoming movies'
+        option.choice 'View by popularity'
+
+    end
+
     
 
 
