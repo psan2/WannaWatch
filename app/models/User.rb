@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-class User < ActiveRecord::Base
-    has_many :wannawatch
-
-    def log_in
-    end 
-
-
-    def log_out
-    end 
-=======
 require 'digest'
 
 class User < ActiveRecord::Base
@@ -36,7 +25,6 @@ class User < ActiveRecord::Base
         encrypted_pw = Digest::SHA1.hexdigest(pw)
         return encrypted_pw
     end
->>>>>>> f3bb2075e42082067c0761b9a2f7bae8425e571b
 
     def add_a_watch 
     end 

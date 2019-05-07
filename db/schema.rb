@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_03_143005) do
+ActiveRecord::Schema.define(version: 2019_05_07_085156) do
 
   create_table "movies", force: :cascade do |t|
     t.integer "tmdb_id"
