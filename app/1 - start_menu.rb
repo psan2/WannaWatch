@@ -1,37 +1,18 @@
-require_all 'app'
-
-$prompt = TTY::Prompt.new
-
 def startup
     welcome
     start_menu
 end
 
-def break_
-    puts ""
-end 
-
 def welcome
-    
     glasses_animation
+    small_break
 
-    break_
-    break_
-    break_ 
-
-    greeting
-
-    break_
-    break_ 
-
-    puts random_quotes_generator($greetings)
-    puts random_quotes_generator($greetings)
-end
-
-def greeting 
     hello_user = Artii::Base.new :font => 'slant'
     puts hello_user.asciify('Welcome to WannaWatch!')
-end 
+    small_break
+
+    puts random_quotes_generator($greetings)
+end
 
 def start_menu
     selection = $prompt.select("", per_page: 10) do |a|
@@ -47,7 +28,6 @@ def start_menu
         start_menu
 
     when 'Log in'
-        puts "Welcome back!"
         login
 
     when 'Quit'
@@ -56,17 +36,33 @@ def start_menu
     end
 end
 
-def quit
-    puts "Thanks for watching!"
-    puts random_quotes_generator($goodbyes)
+def login
+
+    username = $prompt.ask("Please enter your username.")
+    if User.find_by(name: username)
+        User.find_by(name: username).authenticate
+
+    else
+        puts "#{random_quotes_generator($errors)} (No, really - we couldn't find your username.)"
+        
+        selection = $prompt.select("Try again?") do |a|
+            a.choice 'Try again'
+            a.choice 'Click your heels three times (to go back to the menu)'
+        end
+
+        case selection
+
+        when 'Try again'
+            login
+
+        when 'Click your heels three times (to go back to the menu)'
+            start_menu
+        end
+    end
 end
 
-
-
 def new_user
-    puts "We're glad you're here!"
     puts random_quotes_generator($greetings)
-    sleep($naptime)
 
     username = new_username
     password = new_password
@@ -80,14 +76,18 @@ def new_username
 
     until username_exists == false
         username = $prompt.ask("Please enter a username.")
+
+        if username == "exit"
+            start_menu
+        end
+
         username_exists = User.where(name: username).length > 0
         if username_exists == true
-            sleep($naptime)
             puts "Unfortunately for Forrest Gump, this seat's taken. And so is that username."
+            small_break
         end
     end
 
-    puts "Welcome to WannaWatch, #{username}!"
     puts random_quotes_generator($greetings)
     return username
 end
@@ -108,10 +108,10 @@ def new_password
         end
 
         if password1 != password2
-            puts "Obi-Wan says, 'These aren't the passwords you're looking for.' Unfortunately, your passwords didn't match. Let's try again."
-            puts random_quotes_generator($errors)
+            puts "#{random_quotes_generator($errors)} Unfortunately, your passwords didn't match. Let's try again."
+
         else
-            puts "Nice one! Accelerating to 88 miles per hour..."
+            puts random_quotes_generator($greetings)
             sleep($naptime)
         end
     end
@@ -119,32 +119,6 @@ def new_password
     return User.hash_password(password1)
 end
 
-def login
-
-    username = $prompt.ask("Please enter your username.")
-    if User.find_by(name: username)
-
-        puts "Welcome back, #{username}!"
-        puts random_quotes_generator($greetings)
-
-        User.find_by(name: username).authenticate
-
-    else
-        puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.)"
-        puts random_quotes_generator($errors)
-        
-        selection = $prompt.select("Try again?") do |a|
-            a.choice 'Try again'
-            a.choice 'Click your heels three times (to go back to the menu)'
-        end
-
-        case selection
-
-        when 'Try again'
-            login
-
-        when 'Click your heels three times (to go back to the menu)'
-            start_menu
-        end
-    end
+def quit
+    puts random_quotes_generator($goodbyes)
 end
