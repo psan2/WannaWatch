@@ -2,6 +2,7 @@ require 'digest'
 
 class User < ActiveRecord::Base
     has_many :wannawatches
+    has_many :movies, :through => :wannawatches
 
     def authenticate
         pw = $prompt.mask("Please enter your password.")
