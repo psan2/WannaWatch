@@ -37,6 +37,7 @@ def view_my_list
         q.messages[:range?] = "Please enter a valid number."
     end
 
+
     if choice.to_i == 0
         main_menu
     else
@@ -52,13 +53,19 @@ def browse_others_like(movie)
         if movie.series != nil
             a.choice 'Browse other movies from this series'
         end
+        a.choice "Don't WannaWatch this anymore?"
         a.choice 'Main menu'
+
     end
 
     case selection 
 
     when 'Browse other movies from this genre'
         browse_by_genre(movie.genre)
+
+    when "Don't WannaWatch this anymore?" 
+        Wannawatch.find_by(user_id:$current_user, movie_id:movie.id).destroy
+        main_menu
         
     when 'Browse other movies from this series'
         browse_by_series(movie.series)
