@@ -15,23 +15,25 @@ def welcome
 end
 
 def start_menu
-    selection = $prompt.select("", per_page: 10) do |a|
-        a.choice 'New user'
-        a.choice 'Log in'
-        a.choice 'Quit'
-    end
+    selection = nil
+    until selection == 'Quit'
+        selection = $prompt.select("", per_page: 10) do |a|
+            a.choice 'New user'
+            a.choice 'Log in'
+            a.choice 'Quit'
+        end
 
-    case selection
+        case selection
 
-    when 'New user'
-        new_user
+        when 'New user'
+            new_user
 
-    when 'Log in'
-        login
+        when 'Log in'
+            login
 
-    when 'Quit'
-        quit
-
+        when 'Quit'
+            quit
+        end
     end
 end
 
@@ -55,16 +57,24 @@ def login
             login
 
         when 'Click your heels three times (to go back to the menu)'
-            start_menu
+            return
         end
     end
+
 end
 
 def new_user
     puts random_quotes_generator($greetings)
-
+    
     username = new_username
+    if username == "exit"
+        return
+    end
+
     password = new_password
+    if password == "exit"
+        return
+    end
 
     $current_user = User.create(name:username, password:password)
     main_menu
@@ -73,12 +83,13 @@ end
 
 def new_username
     username_exists = true
+    username = nil
 
-    until username_exists == false
+    until username_exists == false || username == "exit"
         username = $prompt.ask("Please enter a username.")
 
         if username == "exit"
-            start_menu
+            return username
         end
 
         username_exists = User.where(name: username).length > 0
@@ -99,12 +110,12 @@ def new_password
     until password1 == password2
         password1 = $prompt.mask("Please enter a password:")
         if password1 == "exit"
-            start_menu
+            return
         end
 
         password2 = $prompt.mask("Just to make sure, please enter that password one more time:")
         if password2 == "exit"
-            start_menu
+            return
         end
 
         if password1 != password2
