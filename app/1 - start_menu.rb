@@ -15,14 +15,17 @@ def welcome
     
     glasses_animation
 
-    small_break
-    small_break
+    break_
+    break_
+    break_ 
 
     greeting
 
-    small_break
-    small_break
-    
+    break_
+    break_ 
+
+    puts random_quotes_generator($greetings)
+    puts random_quotes_generator($greetings)
 end
 
 def greeting 
@@ -36,7 +39,6 @@ def start_menu
         a.choice 'Log in'
         a.choice 'Quit'
     end
-    small_break
 
     case selection
 
@@ -56,12 +58,14 @@ end
 
 def quit
     puts "Thanks for watching!"
+    puts random_quotes_generator($goodbyes)
 end
 
 
 
 def new_user
     puts "We're glad you're here!"
+    puts random_quotes_generator($greetings)
     sleep($naptime)
 
     username = new_username
@@ -82,7 +86,9 @@ def new_username
             puts "Unfortunately for Forrest Gump, this seat's taken. And so is that username."
         end
     end
+
     puts "Welcome to WannaWatch, #{username}!"
+    puts random_quotes_generator($greetings)
     return username
 end
 
@@ -103,6 +109,7 @@ def new_password
 
         if password1 != password2
             puts "Obi-Wan says, 'These aren't the passwords you're looking for.' Unfortunately, your passwords didn't match. Let's try again."
+            puts random_quotes_generator($errors)
         else
             puts "Nice one! Accelerating to 88 miles per hour..."
             sleep($naptime)
@@ -116,11 +123,16 @@ def login
 
     username = $prompt.ask("Please enter your username.")
     if User.find_by(name: username)
+
         puts "Welcome back, #{username}!"
+        puts random_quotes_generator($greetings)
+
         User.find_by(name: username).authenticate
 
     else
         puts "What we've got here is a failure to communicate! (No, really - we couldn't find your username.)"
+        puts random_quotes_generator($errors)
+        
         selection = $prompt.select("Try again?") do |a|
             a.choice 'Try again'
             a.choice 'Click your heels three times (to go back to the menu)'

@@ -15,6 +15,7 @@ def main_menu
 
     when 'Logout'
         puts "👓 Hasta la vista, baby 👓"
+        random_quotes_generator($goodbyes)
         $current_user = nil
         start_menu
 
@@ -59,6 +60,7 @@ def find_movies
     case selection 
 
     when 'View by series' 
+        puts random_quotes_generator($greetings)
         view_by_series
     
     when 'View by genre'
@@ -66,11 +68,13 @@ def find_movies
         view_by_genre(genre)
 
     when 'View all upcoming movies' 
+        puts random_quotes_generator($greetings)
         puts 'nothing' 
         #use the relevant API to return all the upcoming movies 
         #refer back to a method that does this
      
     when 'View by popularity'
+        puts random_quotes_generator($greetings)
         puts 'nothing'
         #use the relevant API to select the movies by popularity 
         #refer back to a method that does this
@@ -135,6 +139,7 @@ def add_ww?
 end
 
 def add_wannawatch(movie)
+    puts random_quotes_generator($greetings)
     Wannawatch.find_or_create_by(movie_id: movie.id, user_id:$current_user.id)
     main_menu
 end
