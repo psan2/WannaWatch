@@ -25,7 +25,6 @@ def start_menu
 
     when 'New user'
         new_user
-        start_menu
 
     when 'Log in'
         login
@@ -67,8 +66,9 @@ def new_user
     username = new_username
     password = new_password
 
-    User.create(name:username, password:password)
-    return
+    $current_user = User.create(name:username, password:password)
+    main_menu
+
 end
 
 def new_username
