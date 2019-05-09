@@ -96,17 +96,33 @@ def search_new_movie
     spinner.auto_spin
     search_all_pages(search_term)
     spinner.stop('Done!')
-
     browse_movies(Movie.all.where("title LIKE ?","%#{search_term}%"))
 end
 
 def browse_movies(movies)
+    if movies.length == 0
+        puts "#{random_quotes_generator($errors)}\nSorry, no movies were found. Please try again."
+        return
+    end
     parsed = []
     movies.each { |movie| parsed << "#{movie.title}" + Rainbow("###{movie.tmdb_id}").hide }
-    selection = $prompt.multi_select("Check the movies you'd like to add to your list.\nYou can select just one movie to see more about it!", parsed, filter: true)
+    selection = $prompt.multi_select("Check the movies you'd like to add to your list.\nYou can select just one to see more about it!", parsed, filter: true)
     arr_ids = selection.map { |movie| movie.split("##")[1].to_i}
-    if arr_ids.length == 1
+    if arr_ids.length == 0
+        try_again = $prompt.select("#{random_quotes_generator($errors)}\n You haven't selected any movies! Would you like to try again?") do |a|
+            a.choice 'Try again'
+            a.choice 'Take me to the menu!'
+
+            case try_again
+            when 'Try again'
+                browse_movies(movies)
+            when 'Take me to the menu!'
+                return
+            end
+        end
+    elsif arr_ids.length == 1
         description_view(arr_ids)
+        add_wannawatch(arr_ids)
     else
         add_wannawatch(arr_ids)
     end
@@ -136,9 +152,10 @@ def view_my_list
     if choice.to_i == 0
         return
     else
-        movie = []
-        movie << Movie.find_by(title:table[choice.to_i-1,1]).tmdb_id
-        description_view(movie)
+        arr_ids = []
+        movie = Movie.find_by(title:table[choice.to_i-1,1])
+        arr_ids << movie.tmdb_id
+        description_view(arr_ids)
         browse_others_like(movie)
     end
 end
@@ -185,7 +202,10 @@ def top_users
 
     puts table.render(:unicode, alignments: [:left,:center],width:150,resize:true)
 
-    $prompt.yes?("Continue?")
+    try_again = $prompt.select("") do |a|
+        a.choice 'Continue?'
+            return
+    end
 end
 
 def top_wws
@@ -240,7 +260,7 @@ def description_view(arr_ids)
     small_break
     puts movie.description
     small_break
-    add_wannawatch(arr_ids)
+
 end
 
 def browse_others_like(movie)
@@ -260,18 +280,24 @@ def browse_others_like(movie)
         browse_by_genre(movie.genre)
 
     when "Don't WannaWatch this anymore?"
-        if $prompt.yes?("Are you sure you don't WannaWatch this one?")
+        delete_it = $prompt.select("Are you sure?") do |a|
+            a.choice "Axe it"
+            a.choice "I've seen it"
+            a.choice "Wait, keep it"
+        end
+
+        case delete_it
+        when "Axe it", "I've seen it"
             Wannawatch.find_by(user_id:$current_user, movie_id:movie.id).destroy
             $current_user = User.find_by(id:$current_user.id)
             puts "Pew pew pew. It's gone."
             small_break
-        else
+
+        when "Wait, keep it!"
             puts "No worries - haven't changed a thing!"
             small_break
             sleep($naptime)
         end
-
-        return
 
     when 'Browse other movies from this series'
         browse_by_series(movie.series)

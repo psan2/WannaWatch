@@ -78,13 +78,10 @@ def new_user
     end
 
     password = new_password
-    if password == "exit"
-        return
+    if password != "exit"
+        $current_user = User.create(name:username, password:password)
+        main_menu
     end
-
-    $current_user = User.create(name:username, password:password)
-    main_menu
-
 end
 
 def new_username
@@ -100,7 +97,7 @@ def new_username
 
         username_exists = User.where(name: username).length > 0
         if username_exists == true
-            puts "Unfortunately for Forrest Gump, this seat's taken. And so is that username."
+            puts "#{random_quotes_generator($errors)}.\nNo, really - that username's already taken."
             small_break
         end
     end
@@ -116,12 +113,12 @@ def new_password
     until password1 == password2
         password1 = $prompt.mask("Please enter a password:")
         if password1 == "exit"
-            return
+            return "exit"
         end
 
         password2 = $prompt.mask("Just to make sure, please enter that password one more time:")
         if password2 == "exit"
-            return
+            return "exit"
         end
 
         if password1 != password2
