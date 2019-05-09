@@ -4,16 +4,20 @@ def main_menu
         selection = $prompt.select("", per_page: 10) do |a|
             a.choice 'What do you WannaWatch?'
             a.choice 'View my list'
+            a.choice 'Leaderboards'
             a.choice 'Logout'
         end
 
-        case selection 
+        case selection
 
         when 'What do you WannaWatch?'
             find_movies
-            
+
         when 'View my list'
             view_my_list
+
+        when "Leaderboards"
+            leaderboards
 
         when 'Logout'
             random_quotes_generator($goodbyes)
@@ -21,7 +25,7 @@ def main_menu
             return
 
             sleep($naptime)
-        end 
+        end
     end
     return
 end
@@ -37,19 +41,19 @@ def find_movies
     end
 
     case selection
-    
+
     when 'Browse by title'
         browse_movies(Movie.all)
 
-    when 'Browse by series' 
+    when 'Browse by series'
         series = series_picker
         browse_by_series(series)
-    
+
     when 'Browse by genre'
         genre = genre_picker
         browse_by_genre(genre)
 
-    when 'Browse future releases' 
+    when 'Browse future releases'
         browse_movies(Movie.all.where("release_date > ?",Date.today))
 
     when "Can't find a movie in our library?"
@@ -58,7 +62,7 @@ def find_movies
     when "Back to the menu"
         return
     end
-end 
+end
 
 def series_picker
     series = Movie.series
@@ -83,7 +87,7 @@ end
 def search_new_movie
     puts "To keep things speedy, our database only stores movies from the year 2000 onward. But fear not! We can find your favorite."
     search_term = $prompt.ask("What's it called? (enter a full or partial title)")
-    
+
     spinner = TTY::Spinner.new("[:spinner] Consulting the hive mind...", format: :pulse_2)
     spinner.auto_spin
     search_all_pages(search_term)
@@ -104,14 +108,55 @@ end
 def view_my_list
     index = 1
     table = nil
-    table = TTY::Table.new [' # ', 'Title                         ','Genre    ', 'Release Date     '], []
-    $current_user.wannawatches.sort_by { |ww| ww.movie.release_date }.map do |ww| 
+    table = TTY::Table.new [
+        Rainbow(" # ").bold.blue,
+        Rainbow("Title                           ").bold.blue,
+        Rainbow("Genre          ").bold.blue,
+        Rainbow("Release Date           ").bold.blue], []
+    $current_user.wannawatches.sort_by { |ww| ww.movie.release_date }.map do |ww|
         table << [index, ww.movie.title, ww.movie.genre.split(", ").sort.join(", "), ww.movie.release_date.strftime('%d %b %Y')]
         index += 1
     end
 
     puts table.render(:unicode, alignments: [:center, :left, :left, :left])
-    
+
+    choice = $prompt.ask("Would you like to explore more? Enter the number of the movie you'd like to look at, or 0 to go back.") do |q|
+        q.in("0-#{index-1}")
+        q.messages[:range?] = "Please enter a valid number."
+    end
+
+
+    if choice.to_i == 0
+        return
+    else
+        movie = Movie.find_by(title:(table[(choice.to_i)-1,1]))
+        description_view(movie)
+        browse_others_like(movie)
+    end
+end
+
+def leaderboards
+    selection = $prompt.select("", per_page: 10) do |a|
+        a.choice 'See the users with the most WannaWatches'
+        a.choice 'See what movies are most popular with our users'
+        a.choice 'Leaderboards'
+        a.choice 'Logout'
+    end
+end
+
+def top_wws
+    index = 1
+    table = nil
+    table = TTY::Table.new [' # ', 'Title                         ','Genre    ', 'Release Date     '], []
+    top_wws = Wannawatch.all
+    binding.pry
+    Wannawatch.all.sort_by { |ww| ww.movie.release_date }.map do |ww|
+        table << [index, ww.movie.title, ww.movie.genre.split(", ").sort.join(", "), ww.movie.release_date.strftime('%d %b %Y')]
+        index += 1
+    end
+
+    puts table.render(:unicode, alignments: [:center, :left, :left, :left])
+
     choice = $prompt.ask("Would you like to explore more? Enter the number of the movie you'd like to look at, or 0 to go back.") do |q|
         q.in("0-#{index-1}")
         q.messages[:range?] = "Please enter a valid number."
@@ -137,7 +182,7 @@ def description_view(movie)
     if movie.series != nil
         puts "Series: #{movie.series}"
     end
-    
+
     small_break
     puts movie.description
     small_break
@@ -154,7 +199,7 @@ def browse_others_like(movie)
 
     end
 
-    case selection 
+    case selection
 
     when 'Browse other movies from this genre'
         browse_by_genre(movie.genre)
@@ -173,13 +218,13 @@ def browse_others_like(movie)
         end
 
         return
-        
+
     when 'Browse other movies from this series'
         browse_by_series(movie.series)
 
     when 'Main menu'
         return
-    end 
+    end
 end
 
 def add_wannawatch(movie)

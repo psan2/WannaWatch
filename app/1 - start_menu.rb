@@ -10,11 +10,17 @@ def welcome
     hello_user = Artii::Base.new :font => 'slant'
     puts hello_user.asciify('Welcome to WannaWatch!')
     small_break
-
-    puts random_quotes_generator($greetings)
 end
 
 def start_menu
+    puts <<-text
+WannaWatch lets you keep track of movies that you, well, want to watch!
+This tool uses data from #{Rainbow("TheMovieDB API").italic} to ensure we have the most updated
+information on upcoming releases, and access their huge library to ensure
+that we can track almost any movie ever made. The only question left is...
+
+#{Rainbow("What do you WannaWatch?").bold}
+    text
     selection = nil
     until selection == 'Quit'
         selection = $prompt.select("", per_page: 10) do |a|
@@ -45,7 +51,7 @@ def login
 
     else
         puts "#{random_quotes_generator($errors)} (No, really - we couldn't find your username.)"
-        
+
         selection = $prompt.select("Try again?") do |a|
             a.choice 'Try again'
             a.choice 'Click your heels three times (to go back to the menu)'
@@ -65,7 +71,7 @@ end
 
 def new_user
     puts random_quotes_generator($greetings)
-    
+
     username = new_username
     if username == "exit"
         return
@@ -105,7 +111,7 @@ end
 
 def new_password
     password1 = "1"
-    password2 = "2"         
+    password2 = "2"
 
     until password1 == password2
         password1 = $prompt.mask("Please enter a password:")

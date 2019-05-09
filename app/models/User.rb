@@ -10,6 +10,7 @@ class User < ActiveRecord::Base
             $current_user = self
             small_break
             small_break
+            puts random_quotes_generator($greetings)
             main_menu
         else
             selection = $prompt.select("#{random_quotes_generator($errors)} Try again?", per_page: 10) do |option|
@@ -27,12 +28,5 @@ class User < ActiveRecord::Base
         encrypted_pw = Digest::SHA1.hexdigest(pw)
         return encrypted_pw
     end
-
-    def add_a_watch 
-    end 
-
-    def return_watch_list 
-    end 
-
 end
-    
+
