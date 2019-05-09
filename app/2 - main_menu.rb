@@ -28,7 +28,7 @@ def main_menu
             sleep($naptime)
 
         when 'Quit'
-            random_quotes_generator($errors)
+            random_quotes_generator($goodbyes)
             exit
         end
     end
@@ -201,7 +201,7 @@ def top_wws
         Rainbow("Release Date           ").bold.blue,
         Rainbow("Users Watching").bold.blue], []
 
-    top_wws.sort_by { |movie, count| count}.map do |movie, count|
+    top_wws.sort_by { |movie, count| count}.reverse!.map do |movie, count|
         table << [index, movie.title, movie.release_date.strftime('%d %b %Y'), count]
         index += 1
     end
