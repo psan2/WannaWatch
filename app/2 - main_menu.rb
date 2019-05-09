@@ -6,6 +6,7 @@ def main_menu
             a.choice 'View my list'
             a.choice 'Leaderboards'
             a.choice 'Logout'
+            a.choice 'Quit'
         end
 
         case selection
@@ -25,6 +26,10 @@ def main_menu
             return
 
             sleep($naptime)
+
+        when 'Quit'
+            random_quotes_generator($errors)
+            exit
         end
     end
     return
@@ -41,7 +46,6 @@ def find_movies
     end
 
     case selection
-
     when 'Browse by title'
         browse_movies(Movie.all)
 
@@ -99,10 +103,13 @@ end
 def browse_movies(movies)
     parsed = []
     movies.each { |movie| parsed << "#{movie.title}" + Rainbow("###{movie.tmdb_id}").hide }
-    selection = $prompt.select("Pick a movie to see what it's about:", parsed, filter: true)
-    target_movie = Movie.find_by(tmdb_id:selection.split("##")[1])
-    description_view(target_movie)
-    add_wannawatch(target_movie)
+    selection = $prompt.multi_select("Check the movies you'd like to add to your list.\nYou can select just one movie to see more about it!", parsed, filter: true)
+    arr_ids = selection.map { |movie| movie.split("##")[1].to_i}
+    if arr_ids.length == 1
+        description_view(arr_ids)
+    else
+        add_wannawatch(arr_ids)
+    end
 end
 
 def view_my_list
@@ -140,7 +147,7 @@ def leaderboards
         a.choice 'See the users with the most WannaWatches'
         a.choice 'See what movies are most popular with our users'
         a.choice 'Leaderboards'
-        a.choice 'Logout'
+        a.choice 'Go back'
     end
 end
 
@@ -172,8 +179,10 @@ def top_wws
     end
 end
 
-def description_view(movie)
+def description_view(arr_ids)
     small_break
+    movie = Movie.find_by(tmdb_id:arr_ids[0])
+
     puts movie.title
     border
 
@@ -186,6 +195,7 @@ def description_view(movie)
     small_break
     puts movie.description
     small_break
+    add_wannawatch(arr_ids)
 end
 
 def browse_others_like(movie)
@@ -227,18 +237,30 @@ def browse_others_like(movie)
     end
 end
 
-def add_wannawatch(movie)
-    selection = $prompt.select("How's this look?") do |a|
-        a.choice "I'd WannaWatch this!"
+def add_wannawatch(arr_ids)
+    small_break
+    border
+    small_break
+
+    movies = arr_ids.map { |tmdb_id| Movie.find_by(tmdb_id:tmdb_id).title}
+    selection = $prompt.select("#{movies.join("\n")}") do |a|
+        if arr_ids.length == 1
+            a.choice "I'd WannaWatch this!"
+        else
+            a.choice "I'd WannaWatch these!"
+        end
         a.choice "Let's pick another."
     end
 
     case selection
-    when "I'd WannaWatch this!"
-        Wannawatch.find_or_create_by(movie_id: movie.id, user_id:$current_user.id)
+    when "I'd WannaWatch these!", "I'd WannaWatch this!"
+        arr_ids.each do |tmdb_id|
+            id = Movie.find_by(tmdb_id:tmdb_id).id
+            Wannawatch.find_or_create_by(Movie_id: id, user_id:$current_user.id)
+        end
         small_break
         $current_user = User.find_by(id:$current_user.id)
-        puts "This movie's been added to your list!"
+        puts "Happy watching!"
 
     when "Let's pick another."
         return
