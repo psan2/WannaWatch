@@ -138,4 +138,5 @@ end
 
 def quit
     puts random_quotes_generator($goodbyes)
+    exit
 end

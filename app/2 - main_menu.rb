@@ -6,6 +6,7 @@ def main_menu
             a.choice 'View my list'
             a.choice 'Leaderboards'
             a.choice 'Logout'
+            a.choice 'Quit'
         end
 
         case selection
@@ -25,6 +26,10 @@ def main_menu
             return
 
             sleep($naptime)
+
+        when 'Quit'
+            random_quotes_generator($errors)
+            exit
         end
     end
     return
@@ -41,7 +46,6 @@ def find_movies
     end
 
     case selection
-
     when 'Browse by title'
         browse_movies(Movie.all)
 
@@ -99,10 +103,13 @@ end
 def browse_movies(movies)
     parsed = []
     movies.each { |movie| parsed << "#{movie.title}" + Rainbow("###{movie.tmdb_id}").hide }
-    selection = $prompt.select("Pick a movie to see what it's about:", parsed, filter: true)
-    target_movie = Movie.find_by(tmdb_id:selection.split("##")[1])
-    description_view(target_movie)
-    add_wannawatch(target_movie)
+    selection = $prompt.multi_select("Check the movies you'd like to add to your list.\nYou can select just one movie to see more about it!", parsed, filter: true)
+    arr_ids = selection.map { |movie| movie.split("##")[1].to_i}
+    if arr_ids.length == 1
+        description_view(arr_ids)
+    else
+        add_wannawatch(arr_ids)
+    end
 end
 
 def view_my_list
@@ -110,15 +117,15 @@ def view_my_list
     table = nil
     table = TTY::Table.new [
         Rainbow(" # ").bold.blue,
-        Rainbow("Title                           ").bold.blue,
+        Rainbow("Title                  ").bold.blue,
         Rainbow("Genre          ").bold.blue,
         Rainbow("Release Date           ").bold.blue], []
     $current_user.wannawatches.sort_by { |ww| ww.movie.release_date }.map do |ww|
-        table << [index, ww.movie.title, ww.movie.genre.split(", ").sort.join(", "), ww.movie.release_date.strftime('%d %b %Y')]
+        table << [index, ww.movie.title, ww.movie.genre.split(", ")[0..3].sort.join(", "), ww.movie.release_date.strftime('%d %b %Y')]
         index += 1
     end
 
-    puts table.render(:unicode, alignments: [:center, :left, :left, :left])
+    puts table.render(:unicode, alignments: [:center, :left, :left, :left],width:150,resize:true)
 
     choice = $prompt.ask("Would you like to explore more? Enter the number of the movie you'd like to look at, or 0 to go back.") do |q|
         q.in("0-#{index-1}")
@@ -129,7 +136,8 @@ def view_my_list
     if choice.to_i == 0
         return
     else
-        movie = Movie.find_by(title:(table[(choice.to_i)-1,1]))
+        movie = []
+        movie << Movie.find_by(title:table[choice.to_i-1,1]).tmdb_id
         description_view(movie)
         browse_others_like(movie)
     end
@@ -137,43 +145,89 @@ end
 
 def leaderboards
     selection = $prompt.select("", per_page: 10) do |a|
-        a.choice 'See the users with the most WannaWatches'
-        a.choice 'See what movies are most popular with our users'
-        a.choice 'Leaderboards'
-        a.choice 'Logout'
+        a.choice 'See users who WannaWatch the most'
+        a.choice 'See the most WannaWatched movies'
+        a.choice 'Go back'
+    end
+
+    case selection
+
+    when 'See users who WannaWatch the most'
+        top_users
+
+    when 'See the most WannaWatched movies'
+        top_wws
+
+    when 'Go back'
+        return
     end
 end
 
+def top_users
+    top_users = {}
+
+    User.all.map { |user| top_users[user] = user.wannawatches.length }
+
+    table = TTY::Table.new [
+        Rainbow("User").bold.blue,
+        Rainbow("WannaWatches   ").bold.blue], []
+
+    top_users.sort_by { |user, count| count}.reverse!.map do |user, count|
+        table << [
+            if user == $current_user
+                Rainbow(user.name).bold.red
+            else
+                user.name
+            end,
+            count
+        ]
+    end
+
+    puts table.render(:unicode, alignments: [:left,:center],width:150,resize:true)
+
+    $prompt.yes?("Continue?")
+end
+
 def top_wws
+    top_wws = {}
+
+    ww_movies = Wannawatch.all.map { |ww| ww.movie }.uniq
+    ww_movies.map { |movie| top_wws[movie] = movie.wannawatches.length }
+
     index = 1
-    table = nil
-    table = TTY::Table.new [' # ', 'Title                         ','Genre    ', 'Release Date     '], []
-    top_wws = Wannawatch.all
-    binding.pry
-    Wannawatch.all.sort_by { |ww| ww.movie.release_date }.map do |ww|
-        table << [index, ww.movie.title, ww.movie.genre.split(", ").sort.join(", "), ww.movie.release_date.strftime('%d %b %Y')]
+    table = TTY::Table.new [
+        Rainbow(" # ").bold.blue,
+        Rainbow("Title                  ").bold.blue,
+        Rainbow("Release Date           ").bold.blue,
+        Rainbow("Users Watching").bold.blue], []
+
+    top_wws.sort_by { |movie, count| count}.map do |movie, count|
+        table << [index, movie.title, movie.release_date.strftime('%d %b %Y'), count]
         index += 1
     end
 
-    puts table.render(:unicode, alignments: [:center, :left, :left, :left])
+    puts table.render(:unicode, alignments: [:center, :left, :left, :left],width:150,resize:true)
 
     choice = $prompt.ask("Would you like to explore more? Enter the number of the movie you'd like to look at, or 0 to go back.") do |q|
         q.in("0-#{index-1}")
         q.messages[:range?] = "Please enter a valid number."
     end
 
-
     if choice.to_i == 0
         return
     else
-        movie = Movie.find_by(title:(table[(choice.to_i)-1,1]))
-        description_view(movie)
+        arr_ids = []
+        movie = Movie.find_by(title:table[choice.to_i-1,1])
+        arr_ids << movie.tmdb_id
+        description_view(arr_ids)
         browse_others_like(movie)
     end
 end
 
-def description_view(movie)
+def description_view(arr_ids)
     small_break
+    movie = Movie.find_by(tmdb_id:arr_ids[0])
+
     puts movie.title
     border
 
@@ -186,6 +240,7 @@ def description_view(movie)
     small_break
     puts movie.description
     small_break
+    add_wannawatch(arr_ids)
 end
 
 def browse_others_like(movie)
@@ -206,7 +261,6 @@ def browse_others_like(movie)
 
     when "Don't WannaWatch this anymore?"
         if $prompt.yes?("Are you sure you don't WannaWatch this one?")
-            binding.pry
             Wannawatch.find_by(user_id:$current_user, movie_id:movie.id).destroy
             $current_user = User.find_by(id:$current_user.id)
             puts "Pew pew pew. It's gone."
@@ -227,18 +281,30 @@ def browse_others_like(movie)
     end
 end
 
-def add_wannawatch(movie)
-    selection = $prompt.select("How's this look?") do |a|
-        a.choice "I'd WannaWatch this!"
+def add_wannawatch(arr_ids)
+    small_break
+    border
+    small_break
+
+    movies = arr_ids.map { |tmdb_id| Movie.find_by(tmdb_id:tmdb_id).title}
+    selection = $prompt.select("#{movies.join("\n")}") do |a|
+        if arr_ids.length == 1
+            a.choice "I'd WannaWatch this!"
+        else
+            a.choice "I'd WannaWatch these!"
+        end
         a.choice "Let's pick another."
     end
 
     case selection
-    when "I'd WannaWatch this!"
-        Wannawatch.find_or_create_by(movie_id: movie.id, user_id:$current_user.id)
+    when "I'd WannaWatch these!", "I'd WannaWatch this!"
+        arr_ids.each do |tmdb_id|
+            id = Movie.find_by(tmdb_id:tmdb_id).id
+            Wannawatch.find_or_create_by(Movie_id: id, user_id:$current_user.id)
+        end
         small_break
         $current_user = User.find_by(id:$current_user.id)
-        puts "This movie's been added to your list!"
+        puts "Happy watching!"
 
     when "Let's pick another."
         return
