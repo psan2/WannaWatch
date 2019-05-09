@@ -300,7 +300,7 @@ def add_wannawatch(arr_ids)
     when "I'd WannaWatch these!", "I'd WannaWatch this!"
         arr_ids.each do |tmdb_id|
             id = Movie.find_by(tmdb_id:tmdb_id).id
-            Wannawatch.find_or_create_by(Movie_id: id, user_id:$current_user.id)
+            Wannawatch.find_or_create_by(movie_id: id, user_id:$current_user.id)
         end
         small_break
         $current_user = User.find_by(id:$current_user.id)
