@@ -256,9 +256,11 @@ def description_view(arr_ids)
     if movie.series != nil
         puts "Series: #{movie.series}"
     end
-
+    small_break
+    border
     small_break
     puts movie.description
+    small_break
     small_break
 
 end
