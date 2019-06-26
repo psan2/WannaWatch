@@ -73,12 +73,12 @@ def new_user
     puts random_quotes_generator($greetings)
 
     username = new_username
-    if username == "exit"
+    if username == "exit" || username == nil || username.length > 100
         return
     end
 
     password = new_password
-    if password != "exit"
+    if password != "exit" || password != nil || password.length < 100
         $current_user = User.create(name:username, password:password)
         main_menu
     end

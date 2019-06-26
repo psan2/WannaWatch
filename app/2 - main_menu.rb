@@ -9,6 +9,8 @@ def main_menu
             a.choice 'Quit'
         end
 
+        Date.strp
+
         case selection
 
         when 'What do you WannaWatch?'
@@ -221,7 +223,7 @@ def top_wws
         Rainbow("Release Date           ").bold.blue,
         Rainbow("Users Watching").bold.blue], []
 
-    top_wws.sort_by { |movie, count| count}.reverse!.map do |movie, count|
+    top_wws.sort_by { |movie, count| count}.reverse![0...10].map do |movie, count|
         table << [index, movie.title, movie.release_date.strftime('%d %b %Y'), count]
         index += 1
     end

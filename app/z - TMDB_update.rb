@@ -10,7 +10,7 @@ def update_movies(movie_array)
     movie_array.each do |movie_params|
         Movie.create_with(
             description: movie_params["overview"],
-            release_date: 
+            release_date:
                 if movie_params["release_date"] != ""
                     Date.strptime(movie_params["release_date"],"%Y-%m-%d")
                 else nil
@@ -98,6 +98,10 @@ def update_all_series
 end
 
 def search(search_term, page=1)
+    if search_term.length > 100
+        search_term = search_term[0..100]
+    end
+
     url = URI("https://api.themoviedb.org/3/search/movie?include_adult=false&page=#{page}&query=#{search_term}&language=en-US&api_key=be6bc01e83db5bd420caf0e567ab2965")
 
     http = Net::HTTP.new(url.host, url.port)
@@ -113,13 +117,13 @@ end
 
 def search_all_pages(search_term)
     page_count = search(search_term)["total_pages"]
-    page = 1  
-    arr_results = []  
+    page = 1
+    arr_results = []
 
     page_count.times do
         arr_movies = search(search_term,page)["results"]
         arr_movies.each { |movie| arr_results << movie}
         page += 1
     end
-    update_movies(arr_results)      
+    update_movies(arr_results)
 end
